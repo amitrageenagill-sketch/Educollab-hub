@@ -3,10 +3,13 @@ from google import genai
 from PIL import Image
 from datetime import datetime
 from google.cloud import firestore
+import json
+from google.oauth2 import service_account
 
-# --- Firebase Firestore Setup ---
-db = firestore.Client.from_service_account_json("firebase_key.json")
-
+# --- Firebase Firestore Setup using Streamlit Secrets ---
+key_dict = json.loads(st.secrets["textkey"]["json_key"])
+creds = service_account.Credentials.from_service_account_info(key_dict)
+db = firestore.Client(credentials=creds, project=creds.project_id)
 # --- Streamlit Page Configuration ---
 st.set_page_config(
     page_title="EduCollab Hub",
