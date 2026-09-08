@@ -6,6 +6,41 @@ from google import genai
 from google.cloud import firestore
 from google.oauth2 import service_account
 
+# Firestore क्लाइंट इनिशियलाइज करें
+db = firestore.Client()
+
+st.title("EduCollab Hub - Community Chat")
+
+# यूजर लॉगिन चेक करें
+if "user_email" in st.session_state:
+  user = st.session_state["user_email"]
+  st.write(f"Logged in as: **{user}**")
+
+  # मैसेज इनपुट बॉक्स
+  message = st.text_input("संदेश लिखें...")
+  if st.button("भेजें"):
+    if message:
+      # Firestore में मैसेज सेव करें
+      db.collection("chats").add(
+          {"user": user, "message": message, "timestamp": firestore.SERVER_TIMESTAMP}
+      )
+      st.success("मैसेज भेज दिया गया!")
+
+  st.markdown("---")
+  st.subheader("लाइव चैट फीड")
+
+  # डेटाबेस से मैसेज फेच करें
+  chats_ref = (
+      db.collection("chats").order_by("timestamp", direction=firestore.Query.DESCENDING).limit(20)
+  )
+  chats = chats_ref.stream()
+
+  for chat in chats:
+    chat_data = chat.to_dict()
+    st.write(f"**{chat_data.get('user', 'Anonymous')}**: {chat_data.get('message', '')}")
+else:
+  st.warning("कृपया पहले चैट करने के लिए लॉगिन करें।")
+
 st.set_page_config(page_title="EduCollab Hub", page_icon="🎓", layout="centered")
 
 try:
