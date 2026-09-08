@@ -7,7 +7,10 @@ from google.cloud import firestore
 from google.oauth2 import service_account
 
 # Firestore क्लाइंट इनिशियलाइज करें
-db = firestore.Client()
+# Streamlit secrets से Firebase क्रेडेंशियल्स लोड करें
+key_dict = dict(st.secrets["firebase"])
+credentials = service_account.Credentials.from_service_account_info(key_dict)
+db = firestore.Client(credentials=credentials, project=credentials.project_id)
 
 st.title("EduCollab Hub - Community Chat")
 
