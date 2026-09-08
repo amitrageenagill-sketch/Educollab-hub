@@ -12,7 +12,7 @@ key_dict = dict(st.secrets["firebase"])
 credentials = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=credentials, project=credentials.project_id)
 
-st.title("EduCollab Hub - Community Chat")
+st.title("EduCollab Hub")
 
 # यूजर लॉगिन चेक करें
 if "user_email" in st.session_state:
@@ -20,17 +20,17 @@ if "user_email" in st.session_state:
   st.write(f"Logged in as: **{user}**")
 
   # मैसेज इनपुट बॉक्स
-  message = st.text_input("संदेश लिखें...")
-  if st.button("भेजें"):
+  message = st.text_input("type message...")
+  if st.button("send"):
     if message:
       # Firestore में मैसेज सेव करें
       db.collection("chats").add(
           {"user": user, "message": message, "timestamp": firestore.SERVER_TIMESTAMP}
       )
-      st.success("मैसेज भेज दिया गया!")
+      st.success("sent!")
 
   st.markdown("---")
-  st.subheader("लाइव चैट फीड")
+  st.subheader("live chat")
 
   # डेटाबेस से मैसेज फेच करें
   chats_ref = (
@@ -42,12 +42,12 @@ if "user_email" in st.session_state:
     chat_data = chat.to_dict()
     st.write(f"**{chat_data.get('user', 'Anonymous')}**: {chat_data.get('message', '')}")
 else:
-  st.warning("कृपया पहले चैट करने के लिए लॉगिन करें।")
+  st.warning("login to chat")
 
 st.set_page_config(page_title="EduCollab Hub", page_icon="🎓", layout="centered")
 
 try:
-    key_dict = dict(st.secrets["textkey"])
+    key_dict = dict(st.secrets["firebase"])
     creds = service_account.Credentials.from_service_account_info(key_dict)
     db = firestore.Client(credentials=creds, project=creds.project_id)
 except Exception as e:
